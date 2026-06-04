@@ -1,3 +1,203 @@
+const trainingNeeds = [
+  {
+    title: "Refund exception handling",
+    reason: "Escalations are rising after recent policy changes.",
+    source: "Zendesk, QA, Slack",
+    impact: "High",
+    lift: "+31%",
+    action: "Create scenario drill",
+  },
+  {
+    title: "Billing handoff quality",
+    reason: "Agents miss key context when moving cases from Intercom to email.",
+    source: "Intercom, Gmail",
+    impact: "Medium",
+    lift: "+18%",
+    action: "Update handoff checklist",
+  },
+  {
+    title: "Setup article mismatch",
+    reason: "KB searches are successful, but related tickets still reopen.",
+    source: "Knowledge base, CSAT",
+    impact: "Medium",
+    lift: "+12%",
+    action: "Refresh lesson",
+  },
+];
+
+const cohorts = [
+  {
+    name: "June B2B Support Ramp",
+    trainer: "Nadia",
+    attendance: "94%",
+    pre: "61%",
+    post: "84%",
+    certified: "12 / 18",
+  },
+  {
+    name: "Billing Edge Case Clinic",
+    trainer: "Raka",
+    attendance: "89%",
+    pre: "58%",
+    post: "76%",
+    certified: "5 / 9",
+  },
+  {
+    name: "Vendor Team QA Reset",
+    trainer: "Maya",
+    attendance: "91%",
+    pre: "67%",
+    post: "81%",
+    certified: "19 / 26",
+  },
+];
+
+const sessions = [
+  {
+    time: "09:30",
+    title: "Refund Exceptions Lab",
+    meta: "12 attending",
+  },
+  {
+    time: "13:00",
+    title: "Release Ticket Simulation",
+    meta: "Pre-test open",
+  },
+  {
+    time: "16:00",
+    title: "QA Calibration Review",
+    meta: "Scorecards ready",
+  },
+];
+
+const materials = [
+  {
+    title: "Refund exception roleplay",
+    status: "Ready",
+    detail: "4 realistic customer scenarios generated from QA misses.",
+  },
+  {
+    title: "Billing investigation path",
+    status: "Draft",
+    detail: "Six-step lesson built from 42 recent billing tickets.",
+  },
+  {
+    title: "Launch readiness quiz",
+    status: "Live",
+    detail: "18-question post-test closes today at 18:00.",
+  },
+];
+
+const outcomes = [
+  { label: "QA score", value: "86", delta: "+9 pts" },
+  { label: "Escalation rate", value: "7.8%", delta: "-3.1 pts" },
+  { label: "Reopen rate", value: "11.4%", delta: "-1.2 pts" },
+  { label: "CSAT", value: "4.62", delta: "+0.21" },
+];
+
+const skills = [
+  { label: "Policy judgment", value: 58, target: 85 },
+  { label: "Troubleshooting depth", value: 72, target: 88 },
+  { label: "Tone under pressure", value: 69, target: 84 },
+  { label: "Handoff quality", value: 63, target: 82 },
+];
+
+const integrations = [
+  "Zendesk",
+  "Intercom",
+  "Knowledge base",
+  "Slack",
+  "Google Calendar",
+  "Gmail",
+];
+
+function Badge({
+  children,
+  tone = "neutral",
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "good" | "warn" | "risk";
+}) {
+  return <span className={`badge ${tone}`}>{children}</span>;
+}
+
+function ProgressBar({ value }: { value: number }) {
+  return (
+    <div className="progress">
+      <span style={{ width: `${value}%` }} />
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <main className="page">
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-mark">ST</span>
+          <div>
+            <strong>Support Trainer OS</strong>
+            <small>Training intelligence</small>
+          </div>
+        </div>
+
+        <nav>
+          {[
+            "Command center",
+            "Training needs",
+            "Cohorts",
+            "Materials",
+            "Assessments",
+            "90-day impact",
+            "Integrations",
+          ].map((item, index) => (
+            <button className={index === 0 ? "active" : ""} key={item}>
+              {item}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <section className="workspace">
+        <header className="hero">
+          <div>
+            <p className="eyebrow">Thursday, June 4, 2026</p>
+            <h1>Training impact command center</h1>
+            <p className="hero-copy">
+              Turn live support signals into training plans, then track whether
+              each cohort actually improves in the queue.
+            </p>
+          </div>
+
+          <div className="hero-actions">
+            <button>Import support data</button>
+            <button className="primary">Create material</button>
+          </div>
+        </header>
+
+        <section className="summary-strip" aria-label="Training summary">
+          {[
+            ["Active trainees", "53", "+11 this week"],
+            ["Post-test lift", "19 pts", "Average gain"],
+            ["Priority gaps", "3", "Need trainer action"],
+            ["Survey score", "4.4/5", "28 responses"],
+          ].map(([label, value, note]) => (
+            <div className="summary-item" key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+              <small>{note}</small>
+            </div>
+          ))}
+        </section>
+
+        <section className="priority-layout">
+          <section className="panel main-priority">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Recommended next</p>
+                <h2>Training needs queue</h2>
+              </div>
+              <Badge tone="warn">3 actions</Badge>
             </div>
 
             <div className="needs-list">
