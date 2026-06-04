@@ -1,3 +1,14 @@
+"use client";
+
+import { useState } from "react";
+import type { ReactNode } from "react";
+
+type Modal =
+  | { type: "import" }
+  | { type: "material" }
+  | { type: "drill"; title: string; source: string }
+  | { type: "cohort"; name: string; trainer: string };
+
 const trainingNeeds = [
   {
     title: "Refund exception handling",
@@ -53,21 +64,9 @@ const cohorts = [
 ];
 
 const sessions = [
-  {
-    time: "09:30",
-    title: "Refund Exceptions Lab",
-    meta: "12 attending",
-  },
-  {
-    time: "13:00",
-    title: "Release Ticket Simulation",
-    meta: "Pre-test open",
-  },
-  {
-    time: "16:00",
-    title: "QA Calibration Review",
-    meta: "Scorecards ready",
-  },
+  { time: "09:30", title: "Refund Exceptions Lab", meta: "12 attending" },
+  { time: "13:00", title: "Release Ticket Simulation", meta: "Pre-test open" },
+  { time: "16:00", title: "QA Calibration Review", meta: "Scorecards ready" },
 ];
 
 const materials = [
@@ -111,11 +110,21 @@ const integrations = [
   "Gmail",
 ];
 
+const navItems = [
+  ["Command center", "top"],
+  ["Training needs", "needs"],
+  ["Cohorts", "cohorts"],
+  ["Materials", "materials"],
+  ["Assessments", "assessment"],
+  ["90-day impact", "impact"],
+  ["Integrations", "integrations"],
+];
+
 function Badge({
   children,
   tone = "neutral",
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   tone?: "neutral" | "good" | "warn" | "risk";
 }) {
   return <span className={`badge ${tone}`}>{children}</span>;
@@ -130,8 +139,14 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 export default function Home() {
+  const [modal, setModal] = useState<Modal | null>(null);
+
+  function scrollToSection(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
-    <main className="page">
+    <main className="page" id="top">
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-mark">ST</span>
@@ -142,16 +157,12 @@ export default function Home() {
         </div>
 
         <nav>
-          {[
-            "Command center",
-            "Training needs",
-            "Cohorts",
-            "Materials",
-            "Assessments",
-            "90-day impact",
-            "Integrations",
-          ].map((item, index) => (
-            <button className={index === 0 ? "active" : ""} key={item}>
+          {navItems.map(([item, id], index) => (
+            <button
+              className={index === 0 ? "active" : ""}
+              key={item}
+              onClick={() => scrollToSection(id)}
+            >
               {item}
             </button>
           ))}
@@ -170,8 +181,12 @@ export default function Home() {
           </div>
 
           <div className="hero-actions">
-            <button>Import support data</button>
-            <button className="primary">Create material</button>
+            <button onClick={() => setModal({ type: "import" })}>
+              Import support data
+            </button>
+            <button className="primary" onClick={() => setModal({ type: "material" })}>
+              Create material
+            </button>
           </div>
         </header>
 
@@ -190,7 +205,7 @@ export default function Home() {
           ))}
         </section>
 
-        <section className="priority-layout">
+        <section className="priority-layout" id="needs">
           <section className="panel main-priority">
             <div className="section-heading">
               <div>
@@ -217,14 +232,24 @@ export default function Home() {
                       <strong>{need.lift} volume</strong>
                     </div>
                   </div>
-                  <button>{need.action}</button>
+                  <button
+                    onClick={() =>
+                      setModal({
+                        type: "drill",
+                        title: need.title,
+                        source: need.source,
+                      })
+                    }
+                  >
+                    {need.action}
+                  </button>
                 </article>
               ))}
             </div>
           </section>
 
           <aside className="side-stack">
-            <section className="panel">
+            <section className="panel" id="assessment">
               <div className="section-heading compact">
                 <h2>Today</h2>
                 <Badge>3 sessions</Badge>
@@ -242,7 +267,7 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="panel">
+            <section className="panel" id="impact">
               <div className="section-heading compact">
                 <h2>90-day impact</h2>
               </div>
@@ -260,7 +285,7 @@ export default function Home() {
         </section>
 
         <section className="lower-grid">
-          <section className="panel">
+          <section className="panel" id="cohorts">
             <div className="section-heading compact">
               <h2>Cohort readiness</h2>
             </div>
@@ -273,7 +298,17 @@ export default function Home() {
                 <span>Certified</span>
               </div>
               {cohorts.map((cohort) => (
-                <article className="cohort-row" key={cohort.name}>
+                <button
+                  className="cohort-row"
+                  key={cohort.name}
+                  onClick={() =>
+                    setModal({
+                      type: "cohort",
+                      name: cohort.name,
+                      trainer: cohort.trainer,
+                    })
+                  }
+                >
                   <div>
                     <strong>{cohort.name}</strong>
                     <small>Trainer {cohort.trainer}</small>
@@ -282,7 +317,7 @@ export default function Home() {
                   <span>{cohort.pre}</span>
                   <span>{cohort.post}</span>
                   <span>{cohort.certified}</span>
-                </article>
+                </button>
               ))}
             </div>
           </section>
@@ -308,10 +343,12 @@ export default function Home() {
         </section>
 
         <section className="lower-grid">
-          <section className="panel">
+          <section className="panel" id="materials">
             <div className="section-heading compact">
               <h2>Material builder</h2>
-              <button className="ghost">Open library</button>
+              <button className="ghost" onClick={() => setModal({ type: "material" })}>
+                Open library
+              </button>
             </div>
             <div className="material-list">
               {materials.map((material) => (
@@ -328,7 +365,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="panel">
+          <section className="panel" id="integrations">
             <div className="section-heading compact">
               <h2>Integration health</h2>
               <Badge tone="good">6 connected</Badge>
@@ -344,6 +381,135 @@ export default function Home() {
           </section>
         </section>
       </section>
+
+      {modal ? <DemoModal modal={modal} onClose={() => setModal(null)} /> : null}
     </main>
+  );
+}
+
+function DemoModal({
+  modal,
+  onClose,
+}: {
+  modal: Modal;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-backdrop" role="dialog" aria-modal="true">
+      <div className="modal">
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          x
+        </button>
+
+        {modal.type === "import" ? (
+          <>
+            <p className="eyebrow">Connect data</p>
+            <h2>Import support signals</h2>
+            <p className="modal-copy">
+              Pull topics, QA misses, escalation notes, KB searches, and survey
+              results into the training needs queue.
+            </p>
+            <div className="connector-grid">
+              {integrations.map((item) => (
+                <button key={item}>
+                  <strong>{item}</strong>
+                  <span>Connect</span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : null}
+
+        {modal.type === "material" ? (
+          <>
+            <p className="eyebrow">Material builder</p>
+            <h2>Create training material</h2>
+            <p className="modal-copy">
+              Draft a focused training asset from real issue patterns and assign
+              it to a cohort.
+            </p>
+            <div className="form-grid">
+              <label>
+                Material title
+                <input defaultValue="Refund exception roleplay" />
+              </label>
+              <label>
+                Cohort
+                <select defaultValue="June B2B Support Ramp">
+                  {cohorts.map((cohort) => (
+                    <option key={cohort.name}>{cohort.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="wide">
+                Learning objective
+                <textarea defaultValue="Help agents decide when a refund exception is allowed, when to escalate, and what evidence to capture before replying." />
+              </label>
+            </div>
+            <button className="modal-primary" onClick={onClose}>
+              Save draft
+            </button>
+          </>
+        ) : null}
+
+        {modal.type === "drill" ? (
+          <>
+            <p className="eyebrow">Scenario draft</p>
+            <h2>{modal.title}</h2>
+            <p className="modal-copy">
+              Built from signals in {modal.source}. Use this as the first draft
+              for a practical support simulation.
+            </p>
+            <div className="drill-card">
+              <h3>Customer prompt</h3>
+              <p>
+                A customer requests an exception after missing the refund window
+                by three days. They mention a previous agent gave unclear
+                guidance and threaten to cancel their account.
+              </p>
+              <h3>Trainer scoring rubric</h3>
+              <ul>
+                <li>Confirms timeline and account context before deciding.</li>
+                <li>Applies policy without sounding rigid.</li>
+                <li>Escalates only when exception criteria are met.</li>
+                <li>Documents the final decision clearly in the ticket.</li>
+              </ul>
+            </div>
+            <button className="modal-primary" onClick={onClose}>
+              Add to material library
+            </button>
+          </>
+        ) : null}
+
+        {modal.type === "cohort" ? (
+          <>
+            <p className="eyebrow">Cohort detail</p>
+            <h2>{modal.name}</h2>
+            <p className="modal-copy">
+              Trainer {modal.trainer} is tracking readiness, assessment lift,
+              and post-training queue behavior for this cohort.
+            </p>
+            <div className="detail-grid">
+              <div>
+                <span>Certification</span>
+                <strong>On track</strong>
+              </div>
+              <div>
+                <span>Open coaching</span>
+                <strong>4 agents</strong>
+              </div>
+              <div>
+                <span>Next checkpoint</span>
+                <strong>Day 30</strong>
+              </div>
+              <div>
+                <span>Top gap</span>
+                <strong>Policy judgment</strong>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </div>
+    </div>
   );
 }
